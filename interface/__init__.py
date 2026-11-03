@@ -5,3 +5,4 @@ from .sidebar import SidebarWidget
 from .main_window import MainWindow
 
 __all__ = ["THEME_STYLESHEET", "COLORS", "ChatWidget", "SidebarWidget", "MainWindow"]
+

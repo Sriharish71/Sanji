@@ -157,3 +157,4 @@ QLabel#statusBadge {{
     letter-spacing: 0.5px;
 }}
 """
+

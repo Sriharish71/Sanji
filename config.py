@@ -102,3 +102,4 @@ class Settings(BaseModel):
 
 # Global singleton instance
 settings = Settings.load()
+

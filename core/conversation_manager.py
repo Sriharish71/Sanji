@@ -81,3 +81,4 @@ class ConversationManager:
     def get_display_messages(self) -> List[Dict[str, Any]]:
         """Returns all messages in the active conversation for the UI chat feed."""
         return self.memory.get_all_messages_for_conversation(self.active_conversation_id)
+

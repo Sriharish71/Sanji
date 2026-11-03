@@ -205,3 +205,4 @@ class AIEngine(QObject):
             self._current_thread.wait(500)
             self._current_thread = None
             self._current_worker = None
+

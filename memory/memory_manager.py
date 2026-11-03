@@ -159,3 +159,4 @@ class MemoryManager:
             cursor.execute("SELECT value FROM settings WHERE key = ?", (key,))
             row = cursor.fetchone()
             return row["value"] if row else default
+

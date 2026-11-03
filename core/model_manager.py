@@ -121,3 +121,4 @@ class ModelManager:
             "3. **Verify Service**:\n"
             "   Ensure the Ollama icon is running in your Windows taskbar system tray."
         )
+

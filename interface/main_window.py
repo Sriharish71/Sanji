@@ -25,6 +25,80 @@ from interface.styles import COLORS, THEME_STYLESHEET
 from utils.logger import logger
 
 
+class MemoryView(QWidget):
+    """View displaying persistent SQLite conversation history, sessions, and memory statistics."""
+
+    def __init__(self, assistant: Assistant, parent: Optional[QWidget] = None):
+        super().__init__(parent)
+        self.assistant = assistant
+        self._init_ui()
+
+    def _init_ui(self) -> None:
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(16)
+
+        title = QLabel("CONVERSATION MEMORY & PERSISTENCE")
+        title.setFont(QFont("Segoe UI", 14, QFont.Bold))
+        title.setStyleSheet(f"color: {COLORS['accent_cyan']}; letter-spacing: 1px;")
+        layout.addWidget(title)
+
+        self.memory_display = QTextEdit()
+        self.memory_display.setReadOnly(True)
+        self.memory_display.setStyleSheet(f"""
+            QTextEdit {{
+                background-color: {COLORS['bg_surface']};
+                border: 1px solid {COLORS['border_subtle']};
+                border-radius: 8px;
+                padding: 16px;
+                font-family: 'Consolas', 'Courier New', monospace;
+                font-size: 13px;
+                color: {COLORS['text_primary']};
+            }}
+        """)
+        layout.addWidget(self.memory_display, 1)
+
+    def refresh(self) -> None:
+        """Reloads conversation sessions and message logs from SQLite database."""
+        conversations = self.assistant.memory.list_conversations(limit=20)
+        current_conv_id = self.assistant.conversation.active_conversation_id
+        messages = self.assistant.get_conversation_history()
+
+        lines = [
+            "===========================================================",
+            "             SANJI SQLITE PERSISTENCE TELEMETRY            ",
+            "===========================================================",
+            f"Database File         : {settings.get_resolved_db_path()}",
+            f"Active Session ID     : {current_conv_id}",
+            f"Active Session Msgs   : {len(messages)} message(s)",
+            f"Max Context Sliding   : {settings.max_history_messages} turns",
+            "-----------------------------------------------------------",
+            "STORED CONVERSATIONS (Recent 20):",
+        ]
+
+        if conversations:
+            for c in conversations:
+                active_mark = " [CURRENT ACTIVE]" if c["id"] == current_conv_id else ""
+                lines.append(f"  • [{c['updated_at'][-8:-3]}] {c['title']} (ID: {c['id'][:8]}...){active_mark}")
+        else:
+            lines.append("  (No stored sessions yet)")
+
+        lines.extend([
+            "-----------------------------------------------------------",
+            "ACTIVE SESSION MESSAGES SUMMARY:",
+        ])
+
+        if messages:
+            for m in messages:
+                snippet = m["content"].replace("\n", " ")[:65]
+                lines.append(f"  [{m['role'].upper()}] {snippet}...")
+        else:
+            lines.append("  (Session buffer is empty)")
+
+        lines.append("===========================================================")
+        self.memory_display.setPlainText("\n".join(lines))
+
+
 class DiagnosticsView(QWidget):
     """View displaying detailed Ollama health, system parameters, and setup guidance."""
 
@@ -167,14 +241,18 @@ class MainWindow(QMainWindow):
 
         right_layout.addWidget(header_bar)
 
-        # Stacked Views (Chat vs Diagnostics)
+        # Stacked Views (Chat vs Memory vs Diagnostics)
         self.stack = QStackedWidget()
 
         # View 0: Chat Interface
         self.chat_view = ChatWidget(self)
         self.stack.addWidget(self.chat_view)
 
-        # View 1: Diagnostics
+        # View 1: Memory & History
+        self.mem_view = MemoryView(self.assistant, self)
+        self.stack.addWidget(self.mem_view)
+
+        # View 2: Diagnostics
         self.diag_view = DiagnosticsView(self.assistant, self)
         self.stack.addWidget(self.diag_view)
 
@@ -200,8 +278,8 @@ class MainWindow(QMainWindow):
         self.sidebar.refresh_health_requested.connect(self._check_health_async)
 
         self.sidebar.btn_chat.clicked.connect(lambda: self._switch_view(0))
-        self.sidebar.btn_memory.clicked.connect(lambda: self._switch_view(0))
-        self.sidebar.btn_diagnostics.clicked.connect(lambda: self._switch_view(1))
+        self.sidebar.btn_memory.clicked.connect(lambda: self._switch_view(1))
+        self.sidebar.btn_diagnostics.clicked.connect(lambda: self._switch_view(2))
 
     def _startup_routine(self) -> None:
         """Loads previous conversation messages and checks Ollama health."""
@@ -274,6 +352,10 @@ class MainWindow(QMainWindow):
     def _switch_view(self, index: int) -> None:
         self.stack.setCurrentIndex(index)
         self.sidebar.btn_chat.setChecked(index == 0)
-        self.sidebar.btn_diagnostics.setChecked(index == 1)
+        self.sidebar.btn_memory.setChecked(index == 1)
+        self.sidebar.btn_diagnostics.setChecked(index == 2)
         if index == 1:
+            self.mem_view.refresh()
+        elif index == 2:
             self.assistant.check_health()
+

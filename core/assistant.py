@@ -99,3 +99,4 @@ class Assistant(QObject):
     def get_conversation_history(self) -> List[Dict[str, Any]]:
         """Returns messages for active conversation."""
         return self.conversation.get_display_messages()
+

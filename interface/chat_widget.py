@@ -309,3 +309,4 @@ class ChatWidget(QWidget):
         QTimer.singleShot(20, lambda: self.scroll_area.verticalScrollBar().setValue(
             self.scroll_area.verticalScrollBar().maximum()
         ))
+

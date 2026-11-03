@@ -53,3 +53,4 @@ def setup_logger(
 
 # Default application-wide logger
 logger = setup_logger()
+

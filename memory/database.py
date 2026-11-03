@@ -105,3 +105,4 @@ class Database:
 def utc_now_iso() -> str:
     """Helper to return ISO 8601 UTC timestamp."""
     return datetime.now(timezone.utc).isoformat()
+

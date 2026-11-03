@@ -122,9 +122,11 @@ class SidebarWidget(QWidget):
 
         self.btn_memory = QPushButton("◈  Memory & History")
         self.btn_memory.setProperty("class", "nav-button")
+        self.btn_memory.setCheckable(True)
 
         self.btn_diagnostics = QPushButton("◈  System Diagnostics")
         self.btn_diagnostics.setProperty("class", "nav-button")
+        self.btn_diagnostics.setCheckable(True)
 
         nav_layout.addWidget(self.btn_chat)
         nav_layout.addWidget(self.btn_memory)
@@ -225,3 +227,4 @@ class SidebarWidget(QWidget):
             self.latency_val.setText(f"{status.ping_latency_ms} ms")
         else:
             self.latency_val.setText("-- ms")
+
