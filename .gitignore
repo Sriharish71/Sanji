@@ -38,6 +38,11 @@ ENV/
 sanji.log
 *.log
 
+# Voice & AI model weights
+voice/models/
+*.onnx
+*.onnx.json
+
 # IDEs & OS files
 .vscode/
 .idea/

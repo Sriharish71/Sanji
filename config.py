@@ -60,6 +60,17 @@ class Settings(BaseModel):
         description="Number of recent messages to inject for conversational context"
     )
 
+    # Voice Subsystem (Phase 2)
+    voice_enabled: bool = Field(default=True, description="Enable microphone STT & Piper TTS")
+    stt_model_size: str = Field(default="tiny.en", description="Faster-Whisper model tag (tiny.en, base.en)")
+    stt_device: str = Field(default="cpu", description="Inference device for Whisper (cpu)")
+    stt_compute_type: str = Field(default="int8", description="Quantization type (int8, float32)")
+    tts_voice_model: str = Field(
+        default="voice/models/piper/en_US-lessac-medium.onnx",
+        description="Path to Piper ONNX voice model"
+    )
+    tts_auto_speak: bool = Field(default=True, description="Automatically vocalize AI responses")
+
     # Logging
     log_level: str = Field(default="INFO", description="Logging level (DEBUG, INFO, WARNING, ERROR)")
     log_file: str = Field(default="sanji.log", description="Log file output path")
@@ -85,6 +96,12 @@ class Settings(BaseModel):
             ),
             database_path=os.getenv("DATABASE_PATH", "memory/sanji.db"),
             max_history_messages=int(os.getenv("MAX_HISTORY_MESSAGES", "20")),
+            voice_enabled=os.getenv("VOICE_ENABLED", "true").lower() in ("true", "1", "yes"),
+            stt_model_size=os.getenv("STT_MODEL_SIZE", "tiny.en"),
+            stt_device=os.getenv("STT_DEVICE", "cpu"),
+            stt_compute_type=os.getenv("STT_COMPUTE_TYPE", "int8"),
+            tts_voice_model=os.getenv("TTS_VOICE_MODEL", "voice/models/piper/en_US-lessac-medium.onnx"),
+            tts_auto_speak=os.getenv("TTS_AUTO_SPEAK", "true").lower() in ("true", "1", "yes"),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
             log_file=os.getenv("LOG_FILE", "sanji.log"),
         )

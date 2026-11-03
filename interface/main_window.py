@@ -281,6 +281,15 @@ class MainWindow(QMainWindow):
         self.sidebar.btn_memory.clicked.connect(lambda: self._switch_view(1))
         self.sidebar.btn_diagnostics.clicked.connect(lambda: self._switch_view(2))
 
+        # Voice Subsystem Signals (Phase 2)
+        self.chat_view.mic_toggle_requested.connect(self.assistant.toggle_listening)
+        self.chat_view.mute_toggle_requested.connect(self._on_toggle_mute)
+        self.chat_view.stop_speech_requested.connect(self.assistant.stop_speaking)
+
+        self.assistant.listening_state_changed.connect(self.chat_view.set_recording_state)
+        self.assistant.volume_level_changed.connect(self.chat_view.update_volume_meter)
+        self.assistant.transcription_ready.connect(self.chat_view.insert_transcribed_text)
+
     def _startup_routine(self) -> None:
         """Loads previous conversation messages and checks Ollama health."""
         # 1. Load history
@@ -304,6 +313,9 @@ class MainWindow(QMainWindow):
 
         # 2. Check Ollama Health
         self._check_health_async()
+
+        # 3. Initialize voice UI state
+        self.chat_view.set_mute_state(self.assistant.is_muted)
 
     def _check_health_async(self) -> None:
         """Executes health check via timer to avoid startup hitch."""
@@ -339,6 +351,15 @@ class MainWindow(QMainWindow):
 
     def _on_status_changed(self, msg: str) -> None:
         logger.debug(f"Status update: {msg}")
+        self.chat_view.set_voice_status(msg)
+        if msg in ("Listening...", "Processing...", "Speaking...", "Thinking..."):
+            self.status_chip.setText(msg.upper())
+        elif msg == "Ready":
+            self.status_chip.setText("CORE ONLINE")
+
+    def _on_toggle_mute(self) -> None:
+        muted = self.assistant.toggle_mute()
+        self.chat_view.set_mute_state(muted)
 
     def _on_new_chat(self) -> None:
         self.assistant.start_new_conversation()

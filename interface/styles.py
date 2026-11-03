@@ -156,5 +156,65 @@ QLabel#statusBadge {{
     font-weight: bold;
     letter-spacing: 0.5px;
 }}
+
+/* Voice Controls (Phase 2) */
+QPushButton#micButton {{
+    background-color: {COLORS['bg_surface']};
+    color: {COLORS['accent_cyan']};
+    border: 1px solid {COLORS['accent_cyan']};
+    border-radius: 8px;
+    padding: 8px;
+    min-height: 38px;
+    min-width: 44px;
+    font-size: 16px;
+}}
+
+QPushButton#micButton:hover {{
+    background-color: {COLORS['bg_panel']};
+    border-color: {COLORS['accent_blue']};
+}}
+
+QPushButton#micButton[recording="true"] {{
+    background-color: {COLORS['status_offline']};
+    color: #ffffff;
+    border: 1px solid #ff557f;
+}}
+
+QPushButton#muteButton {{
+    background-color: {COLORS['bg_surface']};
+    color: {COLORS['text_secondary']};
+    border: 1px solid {COLORS['border_subtle']};
+    border-radius: 8px;
+    padding: 8px;
+    min-height: 38px;
+    min-width: 44px;
+    font-size: 14px;
+}}
+
+QPushButton#muteButton:hover {{
+    border-color: {COLORS['accent_cyan']};
+    color: {COLORS['accent_cyan']};
+}}
+
+QPushButton#muteButton[muted="true"] {{
+    background-color: rgba(255, 51, 102, 0.15);
+    color: {COLORS['status_offline']};
+    border-color: {COLORS['status_offline']};
+}}
+
+QPushButton#stopSpeechButton {{
+    background-color: rgba(255, 51, 102, 0.15);
+    color: {COLORS['status_offline']};
+    border: 1px solid {COLORS['status_offline']};
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: bold;
+}}
+
+QPushButton#stopSpeechButton:hover {{
+    background-color: {COLORS['status_offline']};
+    color: #ffffff;
+}}
 """
 
